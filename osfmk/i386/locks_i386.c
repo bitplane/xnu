@@ -162,11 +162,11 @@ typedef void	*pc_t;
 
 // Enforce program order of loads and stores.
 #define ordered_load(target) _Generic( (target),\
-		uint32_t* : __c11_atomic_load((_Atomic uint32_t* )(target), memory_order_relaxed), \
-		uintptr_t*: __c11_atomic_load((_Atomic uintptr_t*)(target), memory_order_relaxed) )
+		uint32_t* : __c11_atomic_load((_Atomic uint32_t* )(uintptr_t)(target), memory_order_relaxed), \
+		uintptr_t*: __c11_atomic_load((_Atomic uintptr_t*)(uintptr_t)(target), memory_order_relaxed) )
 #define ordered_store(target, value) _Generic( (target),\
-		uint32_t* : __c11_atomic_store((_Atomic uint32_t* )(target), (value), memory_order_relaxed), \
-		uintptr_t*: __c11_atomic_store((_Atomic uintptr_t*)(target), (value), memory_order_relaxed) )
+		uint32_t* : __c11_atomic_store((_Atomic uint32_t* )(uintptr_t)(target), (value), memory_order_relaxed), \
+		uintptr_t*: __c11_atomic_store((_Atomic uintptr_t*)(uintptr_t)(target), (value), memory_order_relaxed) )
 
 /*
  * atomic exchange API is a low level abstraction of the operations
