@@ -103,12 +103,12 @@ installsrc:
 
 else ifeq ($(RC_ProjectName),xnu_tests)
 
-export SYSCTL_HW_PHYSICALCPU := $(shell /usr/sbin/sysctl -n hw.physicalcpu)
-export SYSCTL_HW_LOGICALCPU  := $(shell /usr/sbin/sysctl -n hw.logicalcpu)
+export SYSCTL_HW_PHYSICALCPU ?= $(shell /usr/sbin/sysctl -n hw.physicalcpu)
+export SYSCTL_HW_LOGICALCPU  ?= $(shell /usr/sbin/sysctl -n hw.logicalcpu)
 ifeq ($(SYSCTL_HW_PHYSICALCPU),$(SYSCTL_HW_LOGICALCPU))
-MAKEJOBS := --jobs=$(shell expr $(SYSCTL_HW_PHYSICALCPU) + 1)
+MAKEJOBS ?= --jobs=$(shell expr $(SYSCTL_HW_PHYSICALCPU) + 1)
 else
-MAKEJOBS := --jobs=$(SYSCTL_HW_LOGICALCPU)
+MAKEJOBS ?= --jobs=$(SYSCTL_HW_LOGICALCPU)
 endif
 
 default: install
@@ -140,12 +140,12 @@ endif
 # CPUs. If the system does not support SMT, use N+1.
 # If MAKEJOBS or -jN is passed on the make line, that takes precedence.
 #
-export SYSCTL_HW_PHYSICALCPU := $(shell /usr/sbin/sysctl -n hw.physicalcpu)
-export SYSCTL_HW_LOGICALCPU  := $(shell /usr/sbin/sysctl -n hw.logicalcpu)
+export SYSCTL_HW_PHYSICALCPU ?= $(shell /usr/sbin/sysctl -n hw.physicalcpu)
+export SYSCTL_HW_LOGICALCPU  ?= $(shell /usr/sbin/sysctl -n hw.logicalcpu)
 ifeq ($(SYSCTL_HW_PHYSICALCPU),$(SYSCTL_HW_LOGICALCPU))
-MAKEJOBS := --jobs=$(shell expr $(SYSCTL_HW_PHYSICALCPU) + 1)
+MAKEJOBS ?= --jobs=$(shell expr $(SYSCTL_HW_PHYSICALCPU) + 1)
 else
-MAKEJOBS := --jobs=$(SYSCTL_HW_LOGICALCPU)
+MAKEJOBS ?= --jobs=$(SYSCTL_HW_LOGICALCPU)
 endif
 
 TOP_TARGETS =								\

@@ -29,8 +29,8 @@
  */
  
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>	/* for isspace */
-#include <libc.h>
 
 /*
  * State of input scanner.

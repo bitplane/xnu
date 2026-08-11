@@ -192,7 +192,7 @@ endif
 # $(warning TARGET_CONFIGS_ALIASES is $(TARGET_CONFIGS_ALIASES))
 # $(warning ALIAS_CONFIGS is $(ALIAS_CONFIGS))
 
-MEMORY_SIZE := $(shell /usr/sbin/sysctl -n hw.memsize)
+MEMORY_SIZE ?= $(shell /usr/sbin/sysctl -n hw.memsize)
 
 # Assume LTO scaling by default, unless it is being explicitly passed on the command-line
 LARGE_BUILD_FOOTPRINT := $(if $(BUILD_LTO),$(BUILD_LTO),1)
@@ -299,13 +299,15 @@ $(eval $(generated_top_level_build_setup))
 # invalidate current kernel in $(SYMROOT). Timestamp must be +1 from a previous kernel build
 setup: build_setup_bootstrap
 	$(_v)$(TOUCH) $(OBJROOT)/.mach_kernel.timestamp.new
-	$(_v)while [ \! $(OBJROOT)/.mach_kernel.timestamp.new -nt $(OBJROOT)/.mach_kernel.timestamp ]; do \
+	$(_v)while [ -e $(OBJROOT)/.mach_kernel.timestamp ] && \
+	    [ \! $(OBJROOT)/.mach_kernel.timestamp.new -nt $(OBJROOT)/.mach_kernel.timestamp ]; do \
 		$(SLEEP) 1;					\
 		$(TOUCH) $(OBJROOT)/.mach_kernel.timestamp.new;	\
 	done
 	$(_v)$(MV) $(OBJROOT)/.mach_kernel.timestamp.new $(OBJROOT)/.mach_kernel.timestamp
 	$(_v)$(TOUCH) $(OBJROOT)/.symbolset.timestamp.new
-	$(_v)while [ \! $(OBJROOT)/.symbolset.timestamp.new -nt $(OBJROOT)/.symbolset.timestamp ]; do \
+	$(_v)while [ -e $(OBJROOT)/.symbolset.timestamp ] && \
+	    [ \! $(OBJROOT)/.symbolset.timestamp.new -nt $(OBJROOT)/.symbolset.timestamp ]; do \
 		$(SLEEP) 1;					\
 		$(TOUCH) $(OBJROOT)/.symbolset.timestamp.new;	\
 	done

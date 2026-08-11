@@ -9,6 +9,7 @@ include $(MakeInc_def)
 OBJS = decomment.o
 
 CFLAGS = -isysroot $(HOST_SDKROOT) -mmacosx-version-min=$(HOST_OS_VERSION) -g -O0 -I$(SOURCE) -I.
+CFLAGS += $(PUREDARWIN_HOST_CFLAGS)
 
 WARNFLAGS = -Wall
 

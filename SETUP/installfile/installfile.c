@@ -34,14 +34,47 @@
 #include <sys/param.h>
 #include <sys/time.h>
 
-#include <copyfile.h>
-
 void usage(void);
+
+static const char *program_name;
+
+static int
+copy_file(int srcfd, int dstfd)
+{
+	char buffer[64 * 1024];
+	ssize_t count;
+
+	while ((count = read(srcfd, buffer, sizeof(buffer))) != 0) {
+		ssize_t offset = 0;
+
+		if (count < 0) {
+			if (errno == EINTR)
+				continue;
+			return -1;
+		}
+
+		while (offset < count) {
+			ssize_t written = write(dstfd, buffer + offset, count - offset);
+
+			if (written < 0) {
+				if (errno == EINTR)
+					continue;
+				return -1;
+			}
+			if (written == 0) {
+				errno = EIO;
+				return -1;
+			}
+			offset += written;
+		}
+	}
+
+	return 0;
+}
 
 int main(int argc, char * argv[])
 {
 	struct stat sb;
-	void *mset;
 	mode_t mode;
 	bool gotmode = false;
 	int ch;
@@ -51,21 +84,27 @@ int main(int argc, char * argv[])
 	const char *dst = NULL;
 	char dsttmpname[MAXPATHLEN];
 
+	program_name = strrchr(argv[0], '/');
+	program_name = program_name == NULL ? argv[0] : program_name + 1;
+
 	while ((ch = getopt(argc, argv, "cSm:")) != -1) {
 		switch(ch) {
 			case 'c':
 			case 'S':
 				/* ignored for compatibility */
 				break;
-			case 'm':
-				gotmode = true;
-				mset = setmode(optarg);
-				if (!mset)
-					errx(EX_USAGE, "Unrecognized mode %s", optarg);
+			case 'm': {
+				char *end;
+				unsigned long value;
 
-				mode = getmode(mset, 0);
-				free(mset);
+				gotmode = true;
+				errno = 0;
+				value = strtoul(optarg, &end, 8);
+				if (errno != 0 || end == optarg || *end != '\0' || value > 07777)
+					errx(EX_USAGE, "Unrecognized mode %s", optarg);
+				mode = (mode_t)value;
 				break;
+			}
 			case '?':
 			default:
 				usage();
@@ -99,10 +138,9 @@ int main(int argc, char * argv[])
 	if (dstfd < 0)
 		err(EX_UNAVAILABLE, "mkstemp(%s)", dsttmpname);
 
-	ret = fcopyfile(srcfd, dstfd, NULL,
-					COPYFILE_DATA);
+	ret = copy_file(srcfd, dstfd);
 	if (ret < 0)
-		err(EX_UNAVAILABLE, "fcopyfile(%s, %s)", src, dsttmpname);
+		err(EX_UNAVAILABLE, "copyfile(%s, %s)", src, dsttmpname);
 
 	ret = futimes(dstfd, NULL);
 	if (ret < 0)
@@ -132,6 +170,6 @@ int main(int argc, char * argv[])
 void usage(void)
 {
 	fprintf(stderr, "Usage: %s [-c] [-S] [-m <mode>] <src> <dst>\n",
-			getprogname());
+			program_name);
 	exit(EX_USAGE);
 }

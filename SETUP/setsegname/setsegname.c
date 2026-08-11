@@ -20,7 +20,11 @@
  *
  * @APPLE_LICENSE_HEADER_END@
  */
-#include <libc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
 
 #include <sys/stat.h>
@@ -30,6 +34,8 @@
 #include <mach-o/swap.h>
 
 #include <stdbool.h>
+
+static const char *program_name;
 
 /*********************************************************************
 *********************************************************************/
@@ -55,7 +61,7 @@ static int
 readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize)
 {
     int error = -1;
-    int fd;
+    int fd = -1;
     struct stat stat_buf;
 
     *objAddr = 0;
@@ -108,7 +114,7 @@ readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize)
 static void
 usage(void)
 {
-    fprintf(stderr, "Usage: %s [-s OLDSEGNAME] -n NEWSEGNAME input -o output\n", getprogname());
+    fprintf(stderr, "Usage: %s [-s OLDSEGNAME] -n NEWSEGNAME input -o output\n", program_name);
     exit(1);
 }
 
@@ -136,6 +142,8 @@ int main(int argc, char * argv[])
     segname_t             * names = NULL;
     int                     ch;
 
+	program_name = strrchr(argv[0], '/');
+	program_name = program_name == NULL ? argv[0] : program_name + 1;
 
     while ((ch = getopt(argc, argv, "s:n:o:")) != -1) {
         switch (ch) {

@@ -22,7 +22,7 @@
 # @APPLE_OSREFERENCE_LICENSE_HEADER_END@
 #
 
-function usage() {
+usage() {
     echo "Usage: $0 <output>" 1>&2
     exit 1
 }
@@ -79,4 +79,3 @@ for value in ${POSIX_VALUES} ; do
     echo
 done
 } > "$OUTPUT"
-

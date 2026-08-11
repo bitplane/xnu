@@ -37,6 +37,8 @@
 
 void usage(void);
 
+static const char *program_name;
+
 int main(int argc, char * argv[])
 {
 	struct stat sb;
@@ -48,6 +50,10 @@ int main(int argc, char * argv[])
 	const char *dst = NULL;
 	ssize_t readsize, writesize;
 	int i;
+	char *cursor;
+
+	program_name = strrchr(argv[0], '/');
+	program_name = program_name == NULL ? argv[0] : program_name + 1;
 
 	if (argc < 2) {
 		usage();
@@ -64,16 +70,15 @@ int main(int argc, char * argv[])
 	if (newcontent == NULL)
 		err(EX_UNAVAILABLE, "malloc() failed");
 
-	newcontent[0] = '\0';
-
+	cursor = newcontent;
 	for (i=2; i < argc; i++) {
-		strlcat(newcontent, argv[i], newcontentlength);
-		if (i < argc - 1) {
-			strlcat(newcontent, " ", newcontentlength);
-		} else {
-			strlcat(newcontent, "\n", newcontentlength);
-		}
+		size_t length = strlen(argv[i]);
+
+		memcpy(cursor, argv[i], length);
+		cursor += length;
+		*cursor++ = i < argc - 1 ? ' ' : '\n';
 	}
+	*cursor = '\0';
 
 	dstfd = open(dst, O_RDWR | O_CREAT | O_APPEND, DEFFILEMODE);
 	if (dstfd < 0)
@@ -132,6 +137,6 @@ replace:
 void usage(void)
 {
 	fprintf(stderr, "Usage: %s <dst> <new> <contents> <...>\n",
-			getprogname());
+			program_name);
 	exit(EX_USAGE);
 }

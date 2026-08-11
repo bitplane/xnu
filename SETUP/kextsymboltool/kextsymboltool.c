@@ -20,7 +20,11 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-#include <libc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
 #include <ctype.h>
 
@@ -112,7 +116,7 @@ __private_extern__ ToolError
 readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize)
 {
     ToolError err = kErrorFileAccess;
-    int fd;
+    int fd = -1;
     struct stat stat_buf;
 
     *objAddr = 0;
@@ -994,4 +998,3 @@ finish:
         exit(0);
     return(0);
 }
-
