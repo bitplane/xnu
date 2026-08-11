@@ -192,6 +192,8 @@ else
 ARCH_FLAGS_X86_64	  = -arch x86_64
 endif
 ARCH_FLAGS_X86_64H	  = -arch x86_64h
+TOOL_ARCH_FLAGS_X86_64  = -arch x86_64
+TOOL_ARCH_FLAGS_X86_64H = -arch x86_64h
 
 
 

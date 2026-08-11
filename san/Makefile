@@ -58,7 +58,7 @@ endif
 $(OBJPATH)/%.symbolset: $(SOURCE)/%.exports
 	@echo "$(ColorH)SYMBOLSET$(Color0)  $(ColorF)$*$(Color0) \"($(ColorLF)$(CURRENT_ARCH_CONFIG_LC)$(Color0))\""
 	$(_v)$(KEXT_CREATE_SYMBOL_SET)			\
-		$(ARCH_FLAGS_$(CURRENT_ARCH_CONFIG))	\
+		$(TOOL_ARCH_FLAGS_$(CURRENT_ARCH_CONFIG)) \
 		-import $(OBJPATH)/allsymbols		\
 		-export $<		                \
 		-output $@ $(_vstdout)

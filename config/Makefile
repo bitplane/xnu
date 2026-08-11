@@ -56,7 +56,7 @@ $(OBJPATH)/allsymbols: $(OBJPATH)/$(KERNEL_FILE_NAME)
 $(SYMBOL_SET_BUILD): $(OBJPATH)/%.symbolset :  %.exports %.$(EXPORT_SOURCE_ARCH_CONFIG_LC).exports $(OBJPATH)/allsymbols $(KEXT_CREATE_SYMBOL_SET)
 	@echo "$(ColorH)SYMBOLSET$(Color0)  $(ColorF)$*$(Color0) \"($(ColorLF)$(CURRENT_ARCH_CONFIG_LC)$(Color0))\""
 	$(_v)$(KEXT_CREATE_SYMBOL_SET)					\
-		$(ARCH_FLAGS_$(CURRENT_ARCH_CONFIG))			\
+		$(TOOL_ARCH_FLAGS_$(CURRENT_ARCH_CONFIG))		\
 		-import $(OBJPATH)/allsymbols				\
 		-export $(SOURCE)/$*.exports				\
 		-export $(SOURCE)/$*.$(EXPORT_SOURCE_ARCH_CONFIG_LC).exports	\
@@ -66,14 +66,14 @@ $(SYMBOL_SET_BUILD): $(OBJPATH)/%.symbolset :  %.exports %.$(EXPORT_SOURCE_ARCH_
 
 check_all_exports: $(OBJPATH)/allsymbols $(KEXT_CREATE_SYMBOL_SET)
 	$(_v)$(KEXT_CREATE_SYMBOL_SET)					\
-		$(ARCH_FLAGS_$(CURRENT_ARCH_CONFIG))			\
+		$(TOOL_ARCH_FLAGS_$(CURRENT_ARCH_CONFIG))		\
 		-import $(OBJPATH)/allsymbols				\
 		$(foreach symbolset,$(filter-out Private,$(SYMBOL_COMPONENT_LIST)),	\
 			-export $(SOURCE)/$(symbolset).exports		\
 			-export $(SOURCE)/$(symbolset).$(EXPORT_SOURCE_ARCH_CONFIG_LC).exports)	\
 		-output /dev/null $(_vstdout)
 	$(_v)$(KEXT_CREATE_SYMBOL_SET)					\
-		$(ARCH_FLAGS_$(CURRENT_ARCH_CONFIG))			\
+		$(TOOL_ARCH_FLAGS_$(CURRENT_ARCH_CONFIG))		\
 		-import $(OBJPATH)/allsymbols				\
 		$(foreach symbolset,$(filter-out Unsupported,$(SYMBOL_COMPONENT_LIST)),	\
 			-export $(SOURCE)/$(symbolset).exports		\
