@@ -34,9 +34,7 @@
 #include <sys/types.h>
 #include <stdint.h>
 
-#ifndef XNU_KERNEL_PRIVATE
 #include <TargetConditionals.h>
-#endif
 
 __BEGIN_DECLS
 
