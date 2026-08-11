@@ -71,14 +71,16 @@ check_all_exports: $(OBJPATH)/allsymbols $(KEXT_CREATE_SYMBOL_SET)
 		$(foreach symbolset,$(filter-out Private,$(SYMBOL_COMPONENT_LIST)),	\
 			-export $(SOURCE)/$(symbolset).exports		\
 			-export $(SOURCE)/$(symbolset).$(EXPORT_SOURCE_ARCH_CONFIG_LC).exports)	\
-		-output /dev/null $(_vstdout)
+		-output $(OBJPATH)/.check-supported.symbolset $(_vstdout)
+	$(_v)$(RM) $(OBJPATH)/.check-supported.symbolset
 	$(_v)$(KEXT_CREATE_SYMBOL_SET)					\
 		$(TOOL_ARCH_FLAGS_$(CURRENT_ARCH_CONFIG))		\
 		-import $(OBJPATH)/allsymbols				\
 		$(foreach symbolset,$(filter-out Unsupported,$(SYMBOL_COMPONENT_LIST)),	\
 			-export $(SOURCE)/$(symbolset).exports		\
 			-export $(SOURCE)/$(symbolset).$(EXPORT_SOURCE_ARCH_CONFIG_LC).exports)	\
-		-output /dev/null $(_vstdout)
+		-output $(OBJPATH)/.check-all.symbolset $(_vstdout)
+	$(_v)$(RM) $(OBJPATH)/.check-all.symbolset
 
 $(OBJPATH)/$(MD_SUPPORTED_KPI_FILENAME): $(EXPORTS_FILES)
 	@echo "$(ColorH)SUPPORTED_KPI$(Color0) \"($(ColorLF)$(CURRENT_ARCH_CONFIG_LC)$(Color0))\""
