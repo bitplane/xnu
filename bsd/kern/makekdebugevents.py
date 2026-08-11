@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # This script scans the trace.codes file, containing a mapping of event id to
 # event name for all events, and writes to stdout a C declaration for a table
@@ -35,4 +35,3 @@ print "kd_event_t kd_events[] = {"
 for mapping in sorted(code_table, key=lambda x: x[0]):
         print "        {0x%x, \"%s\"}," % mapping
 print "};"
-
