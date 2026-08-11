@@ -31,6 +31,7 @@
 
 #include <stdint.h>
 #include <sys/ioctl.h>
+#include <TargetConditionals.h>
 
 #ifdef XNU_KERNEL_PRIVATE
 #include <mach/boolean.h>

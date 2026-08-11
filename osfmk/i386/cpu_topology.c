@@ -28,6 +28,7 @@
 
 #include <mach/machine.h>
 #include <mach/processor.h>
+#include <stddef.h>
 #include <kern/kalloc.h>
 #include <i386/cpu_affinity.h>
 #include <i386/cpu_topology.h>
@@ -289,4 +290,3 @@ ml_cpu_cache_sharing(unsigned int level)
 		return 0;
 	}
 }
-
