@@ -42,10 +42,19 @@ sub usage {
 	exit 1;
 }
 
-usage unless scalar(@ARGV) == 2;
+usage unless scalar(@ARGV) >= 2;
 
-my $sourceList = $ARGV[0];
-my $outputFile = $ARGV[1];
+my $sourceList = shift @ARGV;
+my $outputFile = shift @ARGV;
+
+my @includes = ();
+for my $arg (@ARGV) {
+	if ($arg =~ /^-[DI]/) {
+		push(@includes, $arg);
+	} else {
+		usage;
+	}
+}
 
 my $f = IO::File->new($sourceList, 'r');
 die "$basename: $sourceList: $!\n" unless defined($f);
@@ -58,15 +67,26 @@ chomp @sources;
 undef $f;
 
 # compiler options
-chomp(my $CC = `xcrun -sdk "$ENV{'SDKROOT'}" -find cc`);
+my $CC = $ENV{"CC"};
+if (!defined($CC) || $CC eq "") {
+	chomp($CC = `xcrun -sdk "$ENV{'SDKROOT'}" -find cc`);
+}
 my @CFLAGS = (
 	"-x assembler-with-cpp",
 	"-c",
-	"-isysroot", $ENV{'SDKROOT'} || "/",
-	"-I".$ENV{"SDKROOT"}."/System/Library/Frameworks/System.framework/PrivateHeaders",
 );
 
-chomp(my $LIBTOOL = `xcrun -sdk "$ENV{'SDKROOT'}" -find libtool`);
+if (defined($ENV{"SDKROOT"}) && $ENV{"SDKROOT"} ne "") {
+	push(@CFLAGS, "-isysroot", $ENV{"SDKROOT"});
+	push(@CFLAGS, "-I".$ENV{"SDKROOT"}."/System/Library/Frameworks/System.framework/PrivateHeaders");
+}
+
+push(@CFLAGS, @includes);
+
+my $LIBTOOL = $ENV{"LIBTOOL"};
+if (!defined($LIBTOOL) || $LIBTOOL eq "") {
+	chomp($LIBTOOL = `xcrun -sdk "$ENV{'SDKROOT'}" -find libtool`);
+}
 my @LIBTOOLFLAGS = (
 	"-static",
 );
@@ -77,7 +97,12 @@ for my $arch (@archs) {
 }
 
 # do each compile
-my $jobs = `sysctl -n hw.ncpu` + 2;
+my $jobs = $ENV{"JOBS"};
+if (!defined($jobs) || $jobs !~ /^\d+$/ || $jobs < 1) {
+	$jobs = `getconf _NPROCESSORS_ONLN 2>/dev/null`;
+	$jobs = `sysctl -n hw.ncpu 2>/dev/null` if $jobs !~ /^\d+$/ || $jobs < 1;
+	$jobs = 1 if $jobs !~ /^\d+$/ || $jobs < 1;
+}
 
 for my $src (@sources) {
 	if ($jobs == 0) {
