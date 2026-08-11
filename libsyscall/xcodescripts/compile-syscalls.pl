@@ -49,7 +49,7 @@ my $outputFile = shift @ARGV;
 
 my @includes = ();
 for my $arg (@ARGV) {
-	if ($arg =~ /^-[DI]/) {
+	if ($arg =~ /^-[DI]/ || $arg =~ /^--target=/) {
 		push(@includes, $arg);
 	} else {
 		usage;
