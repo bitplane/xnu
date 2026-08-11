@@ -61,6 +61,7 @@ atomic_compare_exchange(uintptr_t *target, uintptr_t oldval, uintptr_t newval,
 
 #endif // ATOMIC_PRIVATE
 
+#ifndef os_atomic_rmw_loop
 #define os_atomic_rmw_loop(p, ov, nv, m, ...)  ({ \
 		bool _result = false; \
 		typeof(p) _p = (p); \
@@ -76,5 +77,6 @@ atomic_compare_exchange(uintptr_t *target, uintptr_t oldval, uintptr_t newval,
 	})
 
 #define os_atomic_rmw_loop_give_up(expr) ({ expr; __builtin_trap(); })
+#endif
 
 #endif // _I386_ATOMIC_H_
